@@ -62,6 +62,20 @@ def health():
     return {"status": "ok", "service": "gigshield"}
 
 
+@app.post("/api/reset")
+def reset_data():
+    """Clear all data and reset store to empty state."""
+    def updater(store):
+        store["users"] = []
+        store["earnings"] = []
+        store["spending"] = []
+        store["events"] = []
+        return {"status": "reset"}
+    
+    result = update_store(updater)
+    return jsonify(result), 200
+
+
 @app.post("/api/users")
 def create_user():
     data = get_json()

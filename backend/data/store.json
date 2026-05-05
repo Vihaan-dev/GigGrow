@@ -1,11 +1,63 @@
 {
+  "earnings": [
+    {
+      "amount": 1000,
+      "date": "2026-05-05",
+      "deliveries": null,
+      "id": 1,
+      "platform": "swiggy",
+      "source": "manual",
+      "user_id": 1
+    }
+  ],
+  "events": [],
   "meta": {
-    "version": 1,
     "created_at": "2026-05-05T00:00:00Z",
-    "updated_at": "2026-05-05T00:00:00Z"
+    "updated_at": "2026-05-05T11:26:34Z",
+    "version": 1
   },
-  "users": [],
-  "earnings": [],
-  "spending": [],
-  "events": []
+  "spending": [
+    {
+      "amount": 500,
+      "category": "fuel",
+      "date": "2026-05-05",
+      "id": 1,
+      "notes": "",
+      "source": "manual",
+      "user_id": 1
+    },
+    {
+      "amount": 200,
+      "category": "other",
+      "date": "2026-05-05",
+      "id": 2,
+      "notes": "",
+      "source": "sms",
+      "user_id": 1
+    }
+  ],
+  "users": [
+    {
+      "age": 29,
+      "annual_income": 300000,
+      "current_savings": 3200,
+      "household_obligation": 5000,
+      "id": 1,
+      "language": "hindi",
+      "mandatory_spend": 12000,
+      "name": "Ramesh",
+      "platform": "swiggy"
+    },
+    {
+      "age": 25,
+      "annual_income": 300000,
+      "current_savings": 0,
+      "household_obligation": 10000,
+      "id": 2,
+      "language": "hindi",
+      "mandatory_spend": 1000,
+      "name": "Vihaan",
+      "platform": "swiggy"
+    }
+  ]
 }

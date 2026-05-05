@@ -13,7 +13,7 @@ def _model():
         return None
 
     genai.configure(api_key=api_key)
-    model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     return genai.GenerativeModel(model_name)
 
 
@@ -24,10 +24,12 @@ def generate_text(prompt):
 
     try:
         response = model.generate_content(prompt)
-    except Exception:
-        return "Gemini request failed."
+    except Exception as e:
+        import sys
+        print(f"Gemini API error: {type(e).__name__}: {e}", file=sys.stderr)
+        return "I'm having trouble thinking right now. Please try again."
 
     if not response or not getattr(response, "text", None):
-        return "Gemini did not return a response."
+        return "I couldn't think of a good response. Please try again."
 
     return response.text.strip()
