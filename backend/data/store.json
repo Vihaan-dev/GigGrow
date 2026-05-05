@@ -1,36 +1,54 @@
 {
   "earnings": [
     {
-      "amount": 1000,
-      "date": "2026-05-05",
-      "deliveries": null,
+      "amount": 920,
+      "created_at": "2026-05-05T12:16:07Z",
+      "date": "2026-04-06",
+      "deliveries": 6,
       "id": 1,
       "platform": "swiggy",
-      "source": "manual",
+      "source": "sms",
       "user_id": 1
     }
   ],
-  "events": [],
+  "events": [
+    {
+      "amount": 920,
+      "category": null,
+      "created_at": "2026-05-05T12:16:07Z",
+      "date": "2026-04-06",
+      "id": 1,
+      "message": "Swiggy credit Rs 920",
+      "metadata": {},
+      "tags": [],
+      "type": "sms_income",
+      "user_id": 1
+    },
+    {
+      "amount": null,
+      "category": null,
+      "created_at": "2026-05-05T12:16:07Z",
+      "date": "2026-04-06",
+      "id": 2,
+      "message": "HDFC: Debit Rs 320 at petrol pump",
+      "metadata": {},
+      "tags": [],
+      "type": "sms_expense",
+      "user_id": 1
+    }
+  ],
   "meta": {
     "created_at": "2026-05-05T00:00:00Z",
-    "updated_at": "2026-05-05T11:26:34Z",
+    "updated_at": "2026-05-05T12:19:40Z",
     "version": 1
   },
   "spending": [
     {
-      "amount": 500,
+      "amount": 320,
       "category": "fuel",
-      "date": "2026-05-05",
+      "created_at": "2026-05-05T12:16:07Z",
+      "date": "2026-04-06",
       "id": 1,
-      "notes": "",
-      "source": "manual",
-      "user_id": 1
-    },
-    {
-      "amount": 200,
-      "category": "other",
-      "date": "2026-05-05",
-      "id": 2,
       "notes": "",
       "source": "sms",
       "user_id": 1
@@ -49,14 +67,14 @@
       "platform": "swiggy"
     },
     {
-      "age": 25,
+      "age": 29,
       "annual_income": 300000,
-      "current_savings": 0,
-      "household_obligation": 10000,
+      "current_savings": 3200,
+      "household_obligation": 5000,
       "id": 2,
       "language": "hindi",
-      "mandatory_spend": 1000,
-      "name": "Vihaan",
+      "mandatory_spend": 12000,
+      "name": "Ramesh",
       "platform": "swiggy"
     }
   ]
