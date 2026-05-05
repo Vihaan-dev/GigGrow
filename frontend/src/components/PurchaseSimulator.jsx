@@ -32,6 +32,7 @@ export default function PurchaseSimulator({ userId }) {
           placeholder="Purchase amount"
         />
         <select value={language} onChange={(event) => setLanguage(event.target.value)}>
+          <option value="english">English</option>
           <option value="hindi">Hindi</option>
           <option value="kannada">Kannada</option>
         </select>

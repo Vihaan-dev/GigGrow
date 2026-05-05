@@ -17,6 +17,8 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+ALLOWED_LANGUAGES = {"english", "hindi", "kannada"}
+
 
 def json_error(message, status=400):
     return jsonify({"error": message}), status
@@ -44,6 +46,13 @@ def parse_int_optional(value, field_name, default=0):
     if value is None or value == "":
         return default
     return parse_int(value, field_name)
+
+
+def normalize_language(value, default="hindi"):
+    language = str(value or "").strip().lower()
+    if language in ALLOWED_LANGUAGES:
+        return language
+    return default
 
 
 def find_user(store, user_id):
@@ -93,6 +102,7 @@ def create_user():
         current_savings = parse_int_optional(data.get("current_savings"), "current_savings", 0)
         age = parse_int_optional(data.get("age"), "age", 0)
         annual_income = parse_int_optional(data.get("annual_income"), "annual_income", 0)
+        language = normalize_language(data.get("language"))
     except ValueError as exc:
         return json_error(str(exc))
 
@@ -101,7 +111,7 @@ def create_user():
         user = {
             "id": user_id,
             "name": data["name"],
-            "language": data["language"],
+            "language": language,
             "platform": data["platform"],
             "mandatory_spend": mandatory_spend,
             "household_obligation": household_obligation,
@@ -546,12 +556,13 @@ def chat():
         user_id = parse_int(data["user_id"], "user_id")
     except ValueError as exc:
         return json_error(str(exc))
-    language = data.get("language", "hindi")
 
     store = read_store()
     user = find_user(store, user_id)
     if not user:
         return json_error("user_not_found", 404)
+
+    language = normalize_language(data.get("language"), normalize_language(user.get("language"), "hindi"))
 
     earnings = filter_by_user(store.get("earnings", []), user_id)
     spending = filter_by_user(store.get("spending", []), user_id)
@@ -571,7 +582,7 @@ def chat():
         "- Total spending: {spending}\n"
         "- Projected month earnings: {projected}\n"
         "- Recent day types: {day_types}\n\n"
-        "Respond in 2-3 sentences, no English if language is Hindi or Kannada."
+        "Respond in 2-3 sentences. If language is Hindi or Kannada, avoid English words."
     ).format(
         language=language,
         message=data["message"],
@@ -606,12 +617,13 @@ def simulate_purchase():
         amount = parse_int(data["amount"], "amount")
     except ValueError as exc:
         return json_error(str(exc))
-    language = data.get("language", "hindi")
 
     store = read_store()
     user = find_user(store, user_id)
     if not user:
         return json_error("user_not_found", 404)
+
+    language = normalize_language(data.get("language"), normalize_language(user.get("language"), "hindi"))
 
     daily_mandatory = user["mandatory_spend"] / 7
     current_savings = user.get("current_savings", 0)

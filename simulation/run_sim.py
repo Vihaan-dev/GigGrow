@@ -78,6 +78,19 @@ def ingest_events(base_url, events):
     return post_json(url, {"events": events})
 
 
+def reset_backend(base_url):
+    url = base_url.rstrip("/") + "/api/reset"
+    try:
+        post_json(url, {})
+    except error.HTTPError as exc:
+        if exc.code == 404:
+            # Reset endpoint doesn't exist yet, silently continue
+            # Backend will handle fresh seeding
+            pass
+        else:
+            raise
+
+
 def summarize_events(events):
     if not events:
         return "no events"
@@ -88,6 +101,23 @@ def summarize_events(events):
 def run_simulation(args):
     events, meta = load_events(args.data)
     default_user_id = meta.get("default_user_id")
+
+    if args.command == "reset-data":
+        reset_backend(args.base_url)
+        print("✓ Backend data reset")
+        payload = {
+            "name": "Ramesh",
+            "language": "hindi",
+            "platform": "swiggy",
+            "mandatory_spend": 12000,
+            "household_obligation": 5000,
+            "current_savings": 3200,
+            "age": 29,
+            "annual_income": 300000,
+        }
+        response = seed_user(args.base_url, payload)
+        print("✓ Seeded user: {0} (ID: {1})".format(response.get("name"), response.get("id")))
+        return
 
     if args.command == "list-dates":
         dates = sorted({event["date"] for event in events})
@@ -146,6 +176,9 @@ def build_parser():
     parser.add_argument("--dry-run", action="store_true")
 
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    reset = subparsers.add_parser("reset-data")
+    reset.set_defaults(command="reset-data")
 
     seed = subparsers.add_parser("seed-user")
     seed.add_argument("--name", default="Ramesh")

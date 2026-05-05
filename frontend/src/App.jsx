@@ -14,6 +14,20 @@ import SchemeList from "./components/SchemeList";
 import LoanList from "./components/LoanList";
 import PurchaseSimulator from "./components/PurchaseSimulator";
 
+// Simple hash-based router keys
+const ROUTES = {
+  DASHBOARD: "#/dashboard",
+  MANUAL: "#/manual",
+  EVENTS: "#/events",
+  CHAT: "#/chat",
+  PURCHASE: "#/purchase",
+  SCHEMES: "#/schemes",
+  PROFILE: "#/profile",
+};
+
+import HeaderNav from "./components/HeaderNav";
+import LoginPage from "./pages/LoginPage";
+
 const emptyProfile = {
   name: "",
   language: "hindi",
@@ -139,211 +153,193 @@ export default function App() {
       };
       const created = await api.createUser(payload);
       setUserId(String(created.id));
+      // set as logged in
+      localStorage.setItem("gigshield_user", String(created.id));
+      setLoggedUser(String(created.id));
       setInfo(`Created user ${created.id}`);
     } catch (err) {
       setError(err.message || "Failed to create user.");
     }
   };
+      // logged user state and basic routing
+      const [loggedUser, setLoggedUser] = useState(() => localStorage.getItem("gigshield_user") || null);
+      const [route, setRoute] = useState(window.location.hash || ROUTES.DASHBOARD);
 
-  return (
-    <div className="app">
-      <header className="header">
-        <div className="header-top">
-          <div className="brand">
-            <h1>GigShield</h1>
-            <span>Safety and clarity for gig worker finances.</span>
-          </div>
-          <div className="toolbar">
-            <label>
-              User id
-              <input
-                value={userId}
-                onChange={(event) => setUserId(event.target.value)}
-                placeholder="1"
-              />
-            </label>
-            <button onClick={refreshAll} disabled={loading || !canLoad}>
-              {loading ? "Loading" : "Refresh"}
-            </button>
-            {error && <span className="chip">{error}</span>}
-            {info && <span className="chip">{info}</span>}
-          </div>
-        </div>
-      </header>
+      useEffect(() => {
+        const onHash = () => setRoute(window.location.hash || ROUTES.DASHBOARD);
+        window.addEventListener("hashchange", onHash);
+        return () => window.removeEventListener("hashchange", onHash);
+      }, []);
 
-      <div className="grid">
-        <div>
-          <section className="section">
-            <div className="section-title">
-              <h2>Snapshot</h2>
-              <span>Last 30 days</span>
-            </div>
-            <div className="stat-grid">
-              <StatCard
-                label="Safety days"
-                value={state?.safety?.days_safe ?? "-"}
-                sublabel={state?.safety?.status || ""}
-                tone={state?.safety?.status === "secure" ? "positive" : state?.safety?.status === "okay" ? "warning" : "danger"}
-              />
-              <StatCard
-                label="Total earnings"
-                value={formatCurrency(totals.earnings)}
-                sublabel={`Projected month ${formatCurrency(state?.summary?.projected_month_earnings)}`}
-                tone="positive"
-              />
-              <StatCard
-                label="Total spending"
-                value={formatCurrency(totals.spending)}
-                sublabel="All categories"
-                tone="warning"
-              />
-              <StatCard
-                label="Current day type"
-                value={lastDay?.day_type || "-"}
-                sublabel={lastDay?.date || ""}
-              />
-            </div>
-            <SafetyMeter daysSafe={state?.safety?.days_safe} />
-          </section>
+      const navigate = (r) => {
+        window.location.hash = r;
+      };
 
-          <section className="section">
-            <div className="section-title">
-              <h2>Earnings trend</h2>
-              <span>Daily earnings</span>
-            </div>
-            <LineChart data={trendData} labels={summaryDays.map((d) => d.date)} />
-            <div className="footer-note">Projected month earnings uses the last 7 days average.</div>
-          </section>
+      const loginAs = (id) => {
+        localStorage.setItem("gigshield_user", String(id));
+        setLoggedUser(String(id));
+        setUserId(String(id));
+        navigate(ROUTES.DASHBOARD);
+      };
 
-          <section className="section">
-            <div className="section-title">
-              <h2>Spending mix</h2>
-              <span>Categories</span>
-            </div>
-            <BarChart data={spendData} />
-          </section>
+      const logout = () => {
+        localStorage.removeItem("gigshield_user");
+        setLoggedUser(null);
+        setUserId("");
+        navigate(ROUTES.DASHBOARD);
+      };
 
-          <section className="section">
-            <div className="section-title">
-              <h2>Notices</h2>
-              <span>Actions to take</span>
+      // Simple pages as internal components
+      const LoginPage = () => {
+        const [loginId, setLoginId] = useState("");
+        return (
+          <div className="center-card">
+            <h2>Welcome to GigShield</h2>
+            <p>Please login with your user id or create a new demo user.</p>
+            <div className="form-row">
+              <input placeholder="Existing user id" value={loginId} onChange={(e) => setLoginId(e.target.value)} />
+              <button onClick={() => loginAs(Number(loginId))} disabled={!loginId}>Login</button>
             </div>
-            <NoticeList items={notices} />
-          </section>
-
-          <section className="section">
-            <div className="section-title">
-              <h2>Schemes and loans</h2>
-              <span>Eligibility</span>
-            </div>
-            <div className="split">
-              <SchemeList userId={userIdNumber} onRefresh={refreshAll} />
-              <LoanList userId={userIdNumber} onRefresh={refreshAll} />
-            </div>
-          </section>
-        </div>
-
-        <div>
-          <section className="section">
-            <div className="section-title">
-              <h2>Profile setup</h2>
-              <span>Create a demo user</span>
-            </div>
-            <div className="form">
+            <div className="divider">or</div>
+            <div>
+              <h3>Create demo user</h3>
               <div className="form-row">
-                <input
-                  name="name"
-                  value={profile.name}
-                  onChange={handleProfileChange}
-                  placeholder="Name"
-                />
+                <input name="name" value={profile.name} onChange={handleProfileChange} placeholder="Name" />
                 <select name="language" value={profile.language} onChange={handleProfileChange}>
+                  <option value="english">English</option>
                   <option value="hindi">Hindi</option>
                   <option value="kannada">Kannada</option>
                 </select>
-              </div>
-              <div className="form-row">
-                <select name="platform" value={profile.platform} onChange={handleProfileChange}>
-                  <option value="swiggy">Swiggy</option>
-                  <option value="zomato">Zomato</option>
-                </select>
-                <input
-                  name="mandatory_spend"
-                  value={profile.mandatory_spend}
-                  onChange={handleProfileChange}
-                  placeholder="Mandatory weekly spend"
-                />
-              </div>
-              <div className="form-row">
-                <input
-                  name="household_obligation"
-                  value={profile.household_obligation}
-                  onChange={handleProfileChange}
-                  placeholder="Household obligation"
-                />
-                <input
-                  name="current_savings"
-                  value={profile.current_savings}
-                  onChange={handleProfileChange}
-                  placeholder="Current savings"
-                />
-              </div>
-              <div className="form-row">
-                <input
-                  name="age"
-                  value={profile.age}
-                  onChange={handleProfileChange}
-                  placeholder="Age"
-                />
-                <input
-                  name="annual_income"
-                  value={profile.annual_income}
-                  onChange={handleProfileChange}
-                  placeholder="Annual income"
-                />
-              </div>
-              <button onClick={createUser}>Create user</button>
-              <div className="footer-note">
-                Creating a new user updates the user id in the toolbar.
+                <button onClick={createUser}>Create</button>
               </div>
             </div>
-          </section>
+          </div>
+        );
+      };
 
-          <section className="section">
-            <div className="section-title">
-              <h2>Manual inputs</h2>
-              <span>Log earnings and spending</span>
+      const HeaderNav = () => (
+        <header className="header">
+          <div className="header-top">
+            <div className="brand">
+              <h1>GigShield</h1>
+              <span>Safety and clarity for gig worker finances.</span>
             </div>
-            <ManualEarningForm userId={userIdNumber} onSaved={refreshAll} />
-            <ManualSpendingForm userId={userIdNumber} onSaved={refreshAll} />
-            <SmsParseForm userId={userIdNumber} onSaved={refreshAll} />
-          </section>
+            <div className="toolbar">
+              <nav className="nav">
+                <a href="#/dashboard">Dashboard</a>
+                <a href="#/manual">Manual</a>
+                <a href="#/events">Events</a>
+                <a href="#/chat">Chat</a>
+                <a href="#/purchase">Purchase</a>
+                <a href="#/schemes">Schemes</a>
+              </nav>
+              <div className="user-controls">
+                <span>UID: {loggedUser}</span>
+                <button onClick={() => { refreshAll(); }}>Refresh</button>
+                <button onClick={logout}>Logout</button>
+              </div>
+            </div>
+          </div>
+        </header>
+      );
 
-          <section className="section">
-            <div className="section-title">
-              <h2>Event ingestion</h2>
-              <span>Part B will hit this</span>
-            </div>
-            <EventIngestForm userId={userIdNumber} onSaved={refreshAll} />
-          </section>
+      const DashboardPage = () => (
+        <div className="grid">
+          <div>
+            <section className="section">
+              <div className="section-title"><h2>Snapshot</h2><span>Last 30 days</span></div>
+              <div className="stat-grid">
+                <StatCard label="Safety days" value={state?.safety?.days_safe ?? "-"} sublabel={state?.safety?.status || ""} tone={state?.safety?.status === "secure" ? "positive" : state?.safety?.status === "okay" ? "warning" : "danger"} />
+                <StatCard label="Total earnings" value={formatCurrency(totals.earnings)} sublabel={`Projected month ${formatCurrency(state?.summary?.projected_month_earnings)}`} tone="positive" />
+                <StatCard label="Total spending" value={formatCurrency(totals.spending)} sublabel="All categories" tone="warning" />
+                <StatCard label="Current day type" value={lastDay?.day_type || "-"} sublabel={lastDay?.date || ""} />
+              </div>
+              <SafetyMeter daysSafe={state?.safety?.days_safe} />
+            </section>
 
-          <section className="section">
-            <div className="section-title">
-              <h2>Purchase simulator</h2>
-              <span>Impact check</span>
-            </div>
-            <PurchaseSimulator userId={userIdNumber} />
-          </section>
+            <section className="section"><div className="section-title"><h2>Earnings trend</h2><span>Daily earnings</span></div><LineChart data={trendData} labels={summaryDays.map((d)=>d.date)} /><div className="footer-note">Projected month earnings uses the last 7 days average.</div></section>
 
-          <section className="section">
-            <div className="section-title">
-              <h2>Chat assistant</h2>
-              <span>Hindi or Kannada</span>
-            </div>
-            <ChatPanel userId={userIdNumber} />
-          </section>
+            <section className="section"><div className="section-title"><h2>Spending mix</h2><span>Categories</span></div><BarChart data={spendData} /></section>
+
+            <section className="section"><div className="section-title"><h2>Notices</h2><span>Actions to take</span></div><NoticeList items={notices} /></section>
+
+            <section className="section"><div className="section-title"><h2>Schemes and loans</h2><span>Eligibility</span></div><div className="split"><SchemeList userId={Number(loggedUser)} onRefresh={refreshAll} /><LoanList userId={Number(loggedUser)} onRefresh={refreshAll} /></div></section>
+          </div>
+
+          <div>
+            <section className="section"><div className="section-title"><h2>Profile</h2><span>Edit</span></div><div className="form"><input name="name" value={profile.name} onChange={handleProfileChange} placeholder="Name" /><button onClick={() => createUser()}>Update</button></div></section>
+          </div>
         </div>
-      </div>
-    </div>
-  );
+      );
+
+      const ManualPage = () => (
+        <div className="container">
+          <h2>Manual inputs</h2>
+          <ManualEarningForm userId={Number(loggedUser)} onSaved={refreshAll} />
+          <ManualSpendingForm userId={Number(loggedUser)} onSaved={refreshAll} />
+          <SmsParseForm userId={Number(loggedUser)} onSaved={refreshAll} />
+        </div>
+      );
+
+      const EventsPage = () => (
+        <div className="container">
+          <h2>Event ingestion</h2>
+          <EventIngestForm userId={Number(loggedUser)} onSaved={refreshAll} />
+        </div>
+      );
+
+      const ChatPage = () => (
+        <div className="container"><h2>Chat assistant</h2><ChatPanel userId={Number(loggedUser)} /></div>
+      );
+
+      const PurchasePage = () => (
+        <div className="container"><h2>Purchase simulator</h2><PurchaseSimulator userId={Number(loggedUser)} /></div>
+      );
+
+      const SchemesPage = () => (
+        <div className="container"><h2>Schemes & Loans</h2><div className="split"><SchemeList userId={Number(loggedUser)} onRefresh={refreshAll} /><LoanList userId={Number(loggedUser)} onRefresh={refreshAll} /></div></div>
+      );
+
+      // validate logged user exists on backend
+      useEffect(() => {
+        let mounted = true;
+        const checkUser = async () => {
+          if (!loggedUser) return;
+          try {
+            await api.getState(Number(loggedUser));
+          } catch (err) {
+            // clear invalid stored user and force login
+            localStorage.removeItem("gigshield_user");
+            if (mounted) {
+              setLoggedUser(null);
+              setUserId("");
+              window.location.hash = ROUTES.DASHBOARD;
+              setInfo("Your session was reset. Please login again.");
+            }
+          }
+        };
+        checkUser();
+        return () => { mounted = false; };
+      }, [loggedUser]);
+
+      // render
+      if (!loggedUser) {
+        return <div className="app"><LoginPage profile={profile} handleProfileChange={handleProfileChange} createUser={createUser} loginAs={loginAs} /></div>;
+      }
+
+      // show header + page
+      return (
+        <div className="app">
+          <HeaderNav />
+          <main className="main">
+            {route === ROUTES.DASHBOARD && <DashboardPage />}
+            {route === ROUTES.MANUAL && <ManualPage />}
+            {route === ROUTES.EVENTS && <EventsPage />}
+            {route === ROUTES.CHAT && <ChatPage />}
+            {route === ROUTES.PURCHASE && <PurchasePage />}
+            {route === ROUTES.SCHEMES && <SchemesPage />}
+            {route === ROUTES.PROFILE && <div className="container">Profile page</div>}
+          </main>
+        </div>
+      );
 }

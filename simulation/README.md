@@ -22,23 +22,23 @@ cd /Users/vihaan/Programming/ClaudeHackathon/backend
 /Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python app.py
 ```
 
-2. Seed a demo user
+2. Reset data (clears all records, seeds a fresh user)
 
 ```bash
 cd /Users/vihaan/Programming/ClaudeHackathon/simulation
-/Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python run_sim.py seed-user
+/Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python run_sim.py reset-data
 ```
 
 3. Replay a single day
 
 ```bash
-/Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python run_sim.py simulate-day --date 2026-04-14
+/Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python run_sim.py simulate-day --date 2026-04-06
 ```
 
 4. Replay a week
 
 ```bash
-/Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python run_sim.py simulate-week --start 2026-04-10
+/Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python run_sim.py simulate-week --start 2026-04-06
 ```
 
 5. Replay the full month
@@ -48,6 +48,12 @@ cd /Users/vihaan/Programming/ClaudeHackathon/simulation
 ```
 
 ## Useful Commands
+
+Reset backend data and reseed demo user:
+
+```bash
+/Users/vihaan/Programming/ClaudeHackathon/.venv/bin/python run_sim.py reset-data
+```
 
 List available dates in the data file:
 
