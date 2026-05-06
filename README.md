@@ -28,7 +28,7 @@ The four evaluation criteria — Impact (25), Technical (30), Ethical (25), Pres
 | **Impact Potential** | [§ The problem](#the-problem) · [§ Personas](#personas-three-distinct-financial-lives) · [§ 90-day outcome](#quantified-outcome) |
 | **Technical Execution** | [§ Architecture](#architecture) · [§ AI integration](#ai-integration--how-its-not-a-chatbot-wrapper) · [§ Forecast model & validation](#forecast-model--honest-validation) · [§ Test suite](#test-suite) |
 | **Ethical Alignment** | [§ Ethical framework](#ethical-framework) · [§ What we never store](#what-we-never-store) · [§ Decision sovereignty](#decision-sovereignty) |
-| **Presentation** | [§ Quick start](#quick-start) · [§ Demo script](#demo-script-90-seconds) · [§ In-app product tour](#in-app-product-tour) |
+| **Presentation** | [§ Quick start](#quick-start) · [§ In-app product tour](#in-app-product-tour) |
 
 ---
 
@@ -382,20 +382,7 @@ Built in [`frontend/src/components/Tour.jsx`](frontend/src/components/Tour.jsx).
 
 ---
 
-## Demo script (90 seconds)
 
-The demo lands on Ramesh by default. Sequence:
-
-1. **Tour fires automatically** on first visit — 30 seconds, judges can skip with Esc.
-2. **AI Briefing** at the top: *"Ramesh, last 7 days you earned ₹7,037 and spent ₹13,888. Sat remains your strongest day on average. Food spend is 37% above baseline. You are 8.0 days safe (okay). Following the GigShield plan: +₹4,244 savings over 90 days."*
-3. **OutcomeCard** shows the headline: **+₹4,244** delta, **₹1,800** interest avoided.
-4. **Daily timeline** — hover any day for breakdown. **Click May 2** → drawer opens, AI explains the rainy-Saturday earnings dip with a z-score.
-5. **Persona switcher** in header → switch to Lakshmi → entire dashboard reshapes. Then Vikram → confidence chip honestly says *"low confidence — rough estimate."*
-6. **Plan a purchase** tab → enter ₹22,000 → 4 options shown, **"Save first, buy later"** ⭐ recommended (~23 days at current pace), runway curve shown.
-7. **Chat** → ask *"Why is my fuel spend high?"* → tool calls visible (`top_overspend()`), answer cites the exact category and percent.
-8. **Privacy** panel → click *"Download my data (JSON)"* → file downloads with `data_minimalism_note` in it.
-
----
 
 ## Test suite
 
