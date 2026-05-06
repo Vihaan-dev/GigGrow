@@ -1,0 +1,14 @@
+.venv
+.env
+node_modules
+dist
+build
+*.log
+*.cache
+*.tmp
+*.bak
+.DS_Store
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
