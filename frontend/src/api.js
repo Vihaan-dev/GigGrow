@@ -30,13 +30,48 @@ async function apiRequest(path, options = {}) {
 }
 
 export const api = {
+  // Core state
+  getLlmStatus: () => apiRequest("/api/llm/status"),
   getState: (userId) => apiRequest(`/api/state/${userId}`),
   getSummary: (userId, days = 30) => apiRequest(`/api/summary/${userId}?days=${days}`),
   getEarnings: (userId, days = 30) => apiRequest(`/api/earnings/${userId}?days=${days}`),
   getSpending: (userId, days = 30) => apiRequest(`/api/spending/${userId}?days=${days}`),
   getEvents: (userId, days = 30) => apiRequest(`/api/events/${userId}?days=${days}`),
+
+  // Intelligence layer
+  getInsights: (userId, days = 30) => apiRequest(`/api/insights/${userId}?days=${days}`),
+  getTimeline: (userId, days = 30, forecast = 14, scenario = "baseline") =>
+    apiRequest(`/api/timeline/${userId}?days=${days}&forecast=${forecast}&scenario=${scenario}`),
+  getForecast: (userId, days = 30, scenario = "baseline") =>
+    apiRequest(`/api/forecast/${userId}?days=${days}&scenario=${scenario}`),
+  getNudges: (userId, language) =>
+    apiRequest(`/api/nudges/${userId}${language ? `?language=${language}` : ""}`),
+  getCrisis: (userId) => apiRequest(`/api/crisis/${userId}`),
+  getOutcome: (userId, days = 90) => apiRequest(`/api/outcome/${userId}?days=${days}`),
+  getBacktest: (userId, holdout = 7) => apiRequest(`/api/backtest/${userId}?holdout=${holdout}`),
+  getBriefing: (userId, language) =>
+    apiRequest(`/api/briefing/${userId}${language ? `?language=${language}` : ""}`),
+  explainDay: (userId, dateIso, language) =>
+    apiRequest(`/api/explain-day/${userId}?date=${dateIso}${language ? `&language=${language}` : ""}`),
+  getDigest: (userId) => apiRequest(`/api/digest/${userId}`),
+  subscribeDigest: (payload) => apiRequest("/api/digest/subscribe", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  }),
+  listUsers: () => apiRequest("/api/users"),
+  exportUser: (userId) => apiRequest(`/api/export/${userId}`),
+  forgetUser: (userId, payload) => apiRequest(`/api/forget/${userId}`, {
+    method: "POST",
+    body: JSON.stringify(payload || { confirm: "I confirm" })
+  }),
+
+  // Mutations + flows
   createUser: (payload) => apiRequest("/api/users", {
     method: "POST",
+    body: JSON.stringify(payload)
+  }),
+  updateUser: (userId, payload) => apiRequest(`/api/users/${userId}`, {
+    method: "PATCH",
     body: JSON.stringify(payload)
   }),
   logEarning: (payload) => apiRequest("/api/earnings/log", {

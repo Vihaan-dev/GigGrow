@@ -111,7 +111,7 @@ def run_simulation(args):
             "platform": "swiggy",
             "mandatory_spend": 12000,
             "household_obligation": 5000,
-            "current_savings": 3200,
+            "current_savings": 13700,
             "age": 29,
             "annual_income": 300000,
         }
